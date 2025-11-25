@@ -1,0 +1,5 @@
+@import "tailwindcss";
+@plugin "daisyui";
+
+/* client/src/index.css */
+@tailwind utilities;
