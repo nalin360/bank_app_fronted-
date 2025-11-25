@@ -2,7 +2,7 @@ import { createContext, useState } from 'react';
 import axios from 'axios';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-const AuthContext = createContext();
+export const AuthContext = createContext();
 
 // Provider component
 export const AuthProvider = ({ children }) => {

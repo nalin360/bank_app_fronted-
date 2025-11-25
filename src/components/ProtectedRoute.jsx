@@ -1,8 +1,5 @@
-// client/src/components/ProtectedRoute.jsx
-import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-
+import { useAuth } from '../hooks/useAuthHook';
 /**
  * Component to protect routes that require authentication.
  * If the user is logged in, it renders the child routes via <Outlet />.
