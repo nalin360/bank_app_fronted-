@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuthHook'; // Import the custom hook
 import { useNavigate, Link } from 'react-router-dom';
+import { validate, VALIDATOR_EMAIL } from '../utils/validators';
 
 export default function LoginPage() {
   // Destructure state and actions from the Auth Context
@@ -10,23 +11,42 @@ export default function LoginPage() {
   // Local state for form inputs
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [validatorError , setvalidatorError] = useState('')
+ 
+
 
   // Effect to redirect if the user is already logged in
   useEffect(() => {
+
+    // validating email
+    const isValidEmail = validate(email,[
+      VALIDATOR_EMAIL()
+    ]) 
+
+    if (!isValidEmail) {
+      setvalidatorError('Email is not valid')
+    }else{
+      setvalidatorError('')
+    }
+
     if (user) {
       // Redirect to the dashboard if authentication is successful
       navigate('/dashboard');
     }
-  }, [user, navigate]);
+  }, [user, navigate,email]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (email && password) {
       // Call the login function from AuthContext
       await login(email, password);
     }
   };
 
+  const changeHandler = (e) => {
+    setEmail(e.target.value)
+  };
   return (
     <div className="flex justify-center items-center pt-20">
       
@@ -48,10 +68,11 @@ export default function LoginPage() {
                 placeholder="you@example.com"
                 className="input input-bordered w-full"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={changeHandler}
                 required
               />
             </div>
+            {validatorError && <div className="alert alert-error text-sm mt-3">{validatorError}</div>}
             
             {/* Password Input */}
             <div className="form-control">
@@ -63,7 +84,7 @@ export default function LoginPage() {
                 placeholder="********"
                 className="input input-bordered w-full"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) =>setPassword(e.target.value) }
                 required
               />
             </div>

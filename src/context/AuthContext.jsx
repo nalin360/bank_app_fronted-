@@ -30,7 +30,7 @@ export const AuthProvider = ({ children }) => {
 
 
     /**
-     * Registers a new user via API call.
+     * Registers a new user 
      */
     const register = async (name, email, password) => {
         setLoading(true);

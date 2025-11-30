@@ -1,29 +1,62 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuthHook';
 import { useNavigate, Link } from 'react-router-dom';
+import { validate, VALIDATOR_EMAIL } from '../utils/validators';
 
 export default function RegisterPage() {
 
   const { register, user, loading, error } = useAuth();
   const navigate = useNavigate();
 
-  
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [localError, setLocalError] = useState(null); 
+  const [localError, setLocalError] = useState(null);
+  
+  // Initialize validatorError with all keys set to an empty string
+  const [validatorError, setvalidatorError] = useState({
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: ''
+  });
+    
 
-  // redirect if the user is already logged in
+  // Redirect and Email Validation
   useEffect(() => {
+    // 1. Validating email
+    const isValidEmail = validate(email, [
+      VALIDATOR_EMAIL()
+    ]);
+
+    if (!isValidEmail && email.length > 0) {
+      setvalidatorError(prev => ({ 
+        ...prev, 
+        email: "Warning: Invalid email address!" 
+      }));
+    } else {
+      setvalidatorError(prev => ({ 
+        ...prev, 
+        email: "" 
+      }));
+    }
+
+
     if (user) {
       navigate('/dashboard');
     }
-  }, [user, navigate]);
+  }, [user, navigate, email]); 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLocalError(null); 
+
+    // Check if there are any active validation errors before submitting
+    if (validatorError.email) {
+      setLocalError(validatorError.email);
+      return;
+    }
 
     // Client-side validation: Check if passwords match
     if (password !== confirmPassword) {
@@ -33,8 +66,8 @@ export default function RegisterPage() {
 
     // validation field check
     if (!name || !email || !password) {
-        setLocalError("Please fill in all fields.");
-        return;
+      setLocalError("Please fill in all fields.");
+      return;
     }
 
     // register from AuthContext
@@ -43,8 +76,6 @@ export default function RegisterPage() {
 
   return (
     <div className="flex justify-center items-center pt-20">
-      
-  
       <div className="card w-96 bg-base-100 shadow-xl border border-gray-200">
         <div className="card-body">
           <h2 className="card-title text-3xl mb-1">Create Your Account</h2>
@@ -52,7 +83,6 @@ export default function RegisterPage() {
           
           <form onSubmit={handleSubmit} className="space-y-4">
             
-      
             <div className="form-control">
               <label className="label">
                 <span className="label-text">Name</span>
@@ -80,8 +110,13 @@ export default function RegisterPage() {
                 required
               />
             </div>
+
+            {/* Use validatorError.email to display the specific error */}
+            {validatorError.email && (
+              <div className="alert alert-warning text-sm">{validatorError.email}</div>
+            )}
+
             
-    
             <div className="form-control">
               <label className="label">
                 <span className="label-text">Password</span>
